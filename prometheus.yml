@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'm1'
+    static_configs:
+      - targets: ['m1:3000']
+  - job_name: 'm2'
+    static_configs:
+      - targets: [ 'm2:4000' ]

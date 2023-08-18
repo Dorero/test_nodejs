@@ -1,0 +1,52 @@
+version: '3'
+services:
+  rabbitmq:
+    image: "rabbitmq:3.9.7-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - main
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - main
+  m1:
+    build:
+      context: ./m1
+    ports:
+      - 3000:3000
+    networks:
+      - main
+    depends_on:
+      - rabbitmq
+      - prometheus
+
+  m2:
+    build:
+      context: ./m2
+    networks:
+      - main
+    depends_on:
+      - rabbitmq
+      - prometheus
+      - m1
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  main:
+    driver: bridge
